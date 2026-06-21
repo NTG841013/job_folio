@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import CompanyResearchDossier from '@/app/components/CompanyResearchDossier';
+import { CoverLetterModal } from '@/app/components/job-details/CoverLetterModal';
 import { insforge } from '@/lib/insforge-client';
 import { MATCH_THRESHOLD } from '@/lib/utils';
 import { 
@@ -39,6 +40,15 @@ interface Job {
   external_apply_url: string;
   found_at: string;
   company_research: any;
+  cover_letter?: string;
+}
+
+interface Profile {
+  full_name: string;
+  email: string;
+  phone?: string;
+  location?: string;
+  cover_letter_tone?: string;
 }
 
 export default function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -47,8 +57,10 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
   const [job, setJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isResearching, setIsResearching] = useState(false);
+  const [isCoverLetterModalOpen, setIsCoverLetterModalOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
-  const [researchLogs, setResearchLogs] = useState<any[]>([]);
+  const [researchLogs, setResearchLogs] = useState<{ message: string; level: string; created_at: string }[]>([]);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
 
@@ -62,16 +74,23 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
     async function fetchJob() {
       try {
         setIsLoading(true);
-        const { data, error } = await insforge.database
-          .from('jobs')
-          .select('*')
-          .eq('id', id)
-          .single();
+        const [jobRes, profileRes] = await Promise.all([
+          insforge.database
+            .from('jobs')
+            .select('*')
+            .eq('id', id)
+            .single(),
+          insforge.database
+            .from('profiles')
+            .select('*')
+            .single() // getCurrentUser filter is implicit in RLS
+        ]);
 
-        if (error) throw error;
-        setJob(data);
+        if (jobRes.error) throw jobRes.error;
+        setJob(jobRes.data);
+        setUserProfile(profileRes.data);
       } catch (error) {
-        console.error('Error fetching job:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -397,7 +416,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                   </div>
                   <div className="space-y-1 text-center">
                     <h3 className="text-sm font-bold text-text-primary">Research in progress</h3>
-                    <p className="text-xs text-text-muted">The agent is browsing {job.company}'s website to build your dossier. This usually takes 30-45 seconds.</p>
+                    <p className="text-xs text-text-muted">The agent is browsing {job.company}&apos;s website to build your dossier. This usually takes 30-45 seconds.</p>
                   </div>
                 </div>
 
@@ -435,7 +454,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                 <div className="space-y-1">
                   <h3 className="text-sm font-bold text-text-primary">No research yet</h3>
                   <p className="text-xs text-text-muted max-w-xs mx-auto">
-                    Click "Research Company" to let the AI browse {job.company}'s public pages and build a dossier.
+                    Click &quot;Research Company&quot; to let the AI browse {job.company}&apos;s public pages and build a dossier.
                   </p>
                 </div>
               </div>
@@ -446,17 +465,34 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
 
       {/* Sticky Bottom Apply Button */}
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/80 to-transparent">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto flex gap-4">
+          <button 
+            onClick={() => setIsCoverLetterModalOpen(true)}
+            className="flex-1 btn-secondary py-4 text-base shadow-xl flex items-center justify-center gap-2 group"
+          >
+            <Sparkles className="w-5 h-5 text-accent group-hover:scale-110 transition-transform" />
+            {job.cover_letter ? 'View Cover Letter' : 'Generate Cover Letter'}
+          </button>
           <a 
             href={job.external_apply_url || job.source_url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-full btn-primary py-4 text-base shadow-xl flex items-center justify-center gap-2"
+            className="flex-[2] btn-primary py-4 text-base shadow-xl flex items-center justify-center gap-2"
           >
             Apply Now at {job.company}
           </a>
         </div>
       </div>
+
+      <CoverLetterModal 
+        isOpen={isCoverLetterModalOpen}
+        onClose={() => setIsCoverLetterModalOpen(false)}
+        jobId={job.id}
+        jobTitle={job.title}
+        company={job.company}
+        existingContent={job.cover_letter}
+        userProfile={userProfile}
+      />
     </main>
   );
 }

@@ -29,3 +29,27 @@ export type MatchResult = {
   matchedSkills: string[];
   missing_skills: string[]; // matching DB naming or use missingSkills? DB uses missing_skills
 };
+
+export type Job = {
+  id: string;
+  user_id: string;
+  run_id?: string;
+  title: string;
+  company: string;
+  location: string;
+  salary?: string;
+  job_type?: string;
+  about_role?: string;
+  responsibilities?: string[];
+  requirements?: string[];
+  nice_to_have?: string[];
+  benefits?: string[];
+  about_company?: string;
+  match_score?: number;
+  match_reason?: string;
+  matched_skills?: string[];
+  missing_skills?: string[];
+  company_research?: any;
+  cover_letter?: string;
+  found_at: string;
+};

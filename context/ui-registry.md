@@ -123,13 +123,29 @@ After building any component — update this file with the component name, file 
 - **Tokens**: `--color-accent`, `--color-accent-muted`, `--color-text-primary`, `--color-text-slate`, `--color-success`, `--color-info`
 
 ### Live Research Log
-- **Path**: `app/find-jobs/[id]/page.tsx`
+- **Path**: `app/find-jobs/[id]/page.tsx`, `app/components/job-details/CoverLetterModal.tsx`
 - **Classes**:
-  - **Log Container**: `bg-surface border border-border rounded-xl overflow-hidden`
+  - **Log Container**: `bg-surface border border-border rounded-xl overflow-hidden`, `bg-overlay` (body)
   - **Log Header**: `bg-surface-tertiary px-4 py-2 border-b border-border flex items-center justify-between`
   - **Log Body**: `p-4 max-h-48 overflow-y-auto space-y-2 font-mono text-[11px] bg-overlay`
   - **Log Entries**: `flex gap-2 animate-in fade-in slide-in-from-left-2 duration-300`, `text-text-muted shrink-0`
 - **Tokens**: `--color-surface-tertiary`, `--color-overlay`, `--color-text-muted`, `--color-success`, `--color-error`, `--color-warning`
+
+### Cover Letter Generator
+- **Path**: `app/components/job-details/CoverLetterModal.tsx`
+- **Classes**:
+  - **Modal Container**: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay/60 backdrop-blur-sm`
+  - **Modal Surface**: `bg-surface border border-border rounded-3xl w-full max-w-2xl max-h-[90vh] shadow-2xl overflow-hidden`
+  - **Header**: `p-6 border-b border-border bg-surface-secondary/50`
+  - **Letter Body**: `bg-surface-tertiary/50 border border-border rounded-2xl p-6 font-serif text-sm text-text-slate leading-relaxed whitespace-pre-wrap min-h-[400px]`
+  - **Action Buttons**: `.btn-primary`, `.btn-secondary`
+- **Tokens**: `--color-accent-muted`, `--color-surface-tertiary`, `--color-text-slate`, `--color-overlay`
+
+### Cover Letter PDF
+- **Path**: `app/components/job-details/CoverLetterPDF.tsx`
+- **Styles**: `@react-pdf/renderer` StyleSheet.
+- **Layout**: Formal business letter (Helvetica, 11pt body, 10pt contact info).
+- **Colors**: Accent (#7C5CFC) for name, Slate (#333) for body, Gray (#666) for contact.
 
 ### Resume Template (Generated PDF)
 - **Path**: `app/components/profile/ResumeTemplate.tsx`

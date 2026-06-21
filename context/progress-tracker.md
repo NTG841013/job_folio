@@ -82,8 +82,8 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 6 — Tailoring & Application
 
-- [ ] 24 Cover Letter Generation UI
-- [ ] 25 Cover Letter Generation Logic (AI)
+- [x] 24 Cover Letter Generation UI ✓ (Created `app/components/job-details/CoverLetterModal.tsx` and `app/components/job-details/CoverLetterPDF.tsx`; implemented interactive modal with log progress polling and professional PDF template; integrated into Job Details page)
+- [x] 25 Cover Letter Generation Logic (AI) ✓ (Created `agent/cover_letter.ts` with GPT-4o synthesis; implemented `/api/agent/cover-letter` route with real-time log feedback; grounded output in company research and user skills)
 
 ---
 
