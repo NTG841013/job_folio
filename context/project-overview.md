@@ -177,6 +177,8 @@ Full width layout on all pages. No sidebar.
 - PostHog analytics charts on dashboard
 - Incomplete profile banner on dashboard
 - "Jobs by Adzuna" credit on all job listings
+- AI-powered Cover Letter generation tailored to job and profile
+- AI-powered Salary Estimation fallback for missing market data
 
 ---
 
@@ -184,8 +186,8 @@ Full width layout on all pages. No sidebar.
 
 - Auto apply — agent does not fill or submit application forms
 - URL input for manual job import
-- Cover letter generation
 - Resume tailoring per job
+- Application status tracking
 - Score recalculation after tailoring
 - Previous Job + Next Job navigation
 - Sidebar navigation — top navbar only

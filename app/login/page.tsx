@@ -60,16 +60,7 @@ function LoginContent() {
 
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-3 mb-24 hover:opacity-90 transition-opacity">
-            <div className="w-10 h-10 bg-surface rounded-lg flex items-center justify-center shadow-lg">
-              <Image 
-                src="/logo.png" 
-                alt="JobFolio Logo" 
-                width={24} 
-                height={24} 
-                className="brightness-0" 
-                style={{ width: "24px", height: "auto" }}
-              />
-            </div>
+            <Image src="/logo.png" alt="JobFolio Logo" width={40} height={40} className="rounded-xl shadow-lg" />
             <span className="text-2xl font-bold tracking-tight">JobFolio</span>
           </Link>
 
@@ -107,16 +98,7 @@ function LoginContent() {
 
         <div className="w-full max-w-[400px] flex flex-col">
           <div className="lg:hidden flex items-center gap-2 mb-12">
-            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shadow-md">
-              <Image 
-                src="/logo.png" 
-                alt="JobFolio Logo" 
-                width={24} 
-                height={24} 
-                className="brightness-0 invert" 
-                style={{ width: "24px", height: "auto" }}
-              />
-            </div>
+            <Image src="/logo.png" alt="JobFolio Logo" width={40} height={40} className="rounded-xl shadow-md" />
             <span className="text-2xl font-bold text-text-darkest">JobFolio</span>
           </div>
 

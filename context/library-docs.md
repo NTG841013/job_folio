@@ -51,20 +51,16 @@ import { cookies } from "next/headers";
 
 export const createInsforgeServer = async () => {
   const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_INSFORGE_URL!,
-    process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
-        },
+  return createServerClient({
+    baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+    anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+    cookies: {
+      get: (name: string) => {
+        const val = cookieStore.get(name);
+        return typeof val === "string" ? val : val?.value;
       },
     },
-  );
+  });
 };
 ```
 
@@ -85,7 +81,7 @@ const insforge = await createInsforgeServer();
 const {
   data: { user },
   error,
-} = await insforge.auth.getUser();
+} = await insforge.auth.getCurrentUser();
 if (!user) redirect("/login");
 ```
 
@@ -230,7 +226,7 @@ const jobRecord = {
   company: job.company.display_name,
   location: job.location.display_name,
   salary: job.salary_min
-    ? `$${Math.round(job.salary_min / 1000)}k - $${Math.round(job.salary_max! / 1000)}k`
+    ? formatSalary(job.salary_min, job.salary_max, country)
     : null,
   job_type: job.contract_type || "fulltime",
   about_role: job.description, // Adzuna returns snippet — used as description
@@ -250,8 +246,35 @@ const jobRecord = {
 - `salary_is_predicted: "1"` means Adzuna estimated the salary — this is normal
 - Adzuna description is a snippet — GPT-4o scores from it, not a full description
 - Default country to `'us'` — support `gb`, `au`, `ca` as alternatives
+- **Fallback Salary Estimation**: When `salary_min` is missing from the Adzuna response, use the `estimateSalary` agent to provide a realistic range based on the job title, company, and location. Mark these values as "Estimated: " in the database.
 
 ---
+
+## Salary Estimator Agent
+
+### Estimation Logic
+
+Uses GPT-4o with local market knowledge to provide salary ranges when original source data is missing.
+
+```typescript
+// agent/salary-estimator.ts
+export async function estimateSalary(
+  title: string, 
+  company: string, 
+  location: string, 
+  country: string, 
+  description: string
+) {
+  // Logic to call GPT-4o and return formatted estimate
+}
+```
+
+**Rules:**
+
+- Only use when original source (e.g. Adzuna) provides no salary data.
+- Always prefix the result with "Estimated: " in the database.
+- Use `formatSalary` utility to ensure consistent currency and USD conversion.
+- grounded in local market data for the specific city/country.
 
 ## Browserbase
 

@@ -99,16 +99,17 @@ Build the complete profile page UI with mock data. No save logic yet.
 
 ---
 
-### 06 Profile Save Logic
+### 06 Profile Save Logic — Completed
 
-Wire profile form to InsForge DB.
+Wired profile form to InsForge DB.
 
-**Logic:**
+**Accomplishments:**
 
-- Server Action in actions/profile.ts saves all form fields to profiles table
-- Resume PDF uploaded to InsForge Storage at resumes/{user_id}/resume.pdf with upsert: true
-- resume_pdf_url saved to profiles table after upload
-- is_complete set to true when all required fields are filled
+- Created `actions/profile.ts` with `updateProfile` and `uploadResume` Server Actions.
+- Implemented file upload to InsForge Storage (`resumes` bucket) with path persistence.
+- Updated `ProfileForm` to use `useTransition` for optimized submission UX.
+- Enabled real data fetching and state synchronization in `ProfilePage`.
+- Added automatic `is_complete` status calculation.
 - Completion percentage and missing fields calculated and saved
 - Form pre-fills with existing data on return visits
 - revalidatePath('/profile') called after save
@@ -453,4 +454,26 @@ Wire three dashboard charts to real PostHog event data for current user.
 | Phase 3 — Find Jobs   | 3        |
 | Phase 4 — Job Details | 2        |
 | Phase 5 — Dashboard   | 4        |
-| **Total**             | **17**   |
+| Phase 6 — Tailoring   | 1        |
+| **Total**             | **18**   |
+
+---
+
+## Phase 6 — Tailoring & Application
+
+### 18 Cover Letter Generation
+
+AI agent drafts a tailored cover letter by fusing job details, company research, and user profile.
+
+**UI:**
+
+- "Generate Cover Letter" button in Job Actions section on Job Details page.
+- Modal displaying generated letter with "Copy" and "Download PDF" buttons.
+- "Refining..." loading state with AI progress messages.
+
+**Logic:**
+
+- POST `/api/agent/cover-letter`
+- GPT-4o synthesis using `profiles.cover_letter_tone`.
+- Grounded in company research (referencing specific company facts).
+- Connection between user's specific "Edge" and the role.

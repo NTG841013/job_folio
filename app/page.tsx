@@ -50,30 +50,6 @@ export default function Home() {
 
       <Navbar />
 
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 left-4 z-50 p-2 bg-surface border border-border rounded text-[10px] text-text-secondary shadow-lg flex flex-col gap-1 max-w-[200px] opacity-50 hover:opacity-100 transition-opacity">
-          <div className="flex justify-between gap-4">
-            <span>SDK User:</span>
-            <span className={user ? "text-success font-bold" : "text-error"}>{user ? user.id.slice(0, 8) : "None"}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Has Token:</span>
-            <span className={(insforge as any).tokenManager?.getAccessToken() ? "text-success" : "text-error"}>
-              {(insforge as any).tokenManager?.getAccessToken() ? "Yes" : "No"}
-            </span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Mounted:</span>
-            <span className="text-text-darkest">Yes</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Auth Cookie:</span>
-            <span className={typeof document !== 'undefined' && document.cookie.includes('insforge_access_token') ? "text-success" : "text-error"}>
-              {typeof document !== 'undefined' && document.cookie.includes('insforge_access_token') ? "Present" : "Missing"}
-            </span>
-          </div>
-        </div>
-      )}
 
       <main className="w-full max-w-7xl mx-auto px-6 pt-20 flex flex-col items-center text-center">
         {/* Hero Section */}
@@ -121,17 +97,17 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-text-darkest mb-8 leading-tight">
               Manage Your Job<br />Search With Ease
             </h2>
-            <div className="space-y-8">
-              <div className="p-6 border-l-2 border-transparent hover:border-accent transition-all cursor-default group">
-                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent">Find jobs that actually fit</h3>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
+                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Find jobs that actually fit</h3>
                 <p className="text-text-secondary">Search by title and location or paste a job link. Get matched roles you can quickly scan.</p>
               </div>
-              <div className="p-6 border-l-2 border-transparent hover:border-accent transition-all cursor-default group">
-                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent">Know the Company Before You Apply</h3>
+              <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
+                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Know the Company Before You Apply</h3>
                 <p className="text-text-secondary">Stop guessing what a company is about. JobFolio browses their site and gives you everything you need to apply with confidence.</p>
               </div>
-              <div className="p-6 border-l-2 border-transparent hover:border-accent transition-all cursor-default group">
-                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent">Keep track of every application</h3>
+              <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
+                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Keep track of every application</h3>
                 <p className="text-text-secondary">Keep a clear view of every job you&apos;ve found, tailored. Your activity and progress all stay in one simple place.</p>
               </div>
             </div>
@@ -164,17 +140,17 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-text-darkest mb-8 leading-tight">
               Apply With More<br />Confidence, Every Time
             </h2>
-            <div className="space-y-8">
-              <div className="p-6 border-l-2 border-transparent hover:border-accent transition-all cursor-default group">
-                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent">Understand your match score</h3>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
+                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Understand your match score</h3>
                 <p className="text-text-secondary">See how your profile lines up with each role before you apply. Get a clear breakdown of what fits and what&apos;s missing.</p>
               </div>
-              <div className="p-6 border-l-2 border-transparent hover:border-accent transition-all cursor-default group">
-                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent">AI-Powered Job Matching</h3>
+              <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
+                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">AI-Powered Job Matching</h3>
                 <p className="text-text-secondary">Stop guessing which jobs are worth applying to. JobFolio scores every role against your actual skills so you focus on the ones that matter.</p>
               </div>
-              <div className="p-6 border-l-2 border-transparent hover:border-accent transition-all cursor-default group">
-                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent">Focus on the right roles</h3>
+              <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
+                <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Focus on the right roles</h3>
                 <p className="text-text-secondary">Filter out low fit jobs and stay on the ones that actually matter. Spend less time sorting and more time applying.</p>
               </div>
             </div>
@@ -184,21 +160,23 @@ export default function Home() {
         {/* Testimonial Section */}
         <section className="w-full py-24 border-t border-border-muted flex flex-col items-center">
           <span className="text-xs font-bold text-accent uppercase tracking-widest mb-6">Success Stories</span>
-          <blockquote className="text-2xl md:text-3xl font-medium text-text-darkest max-w-4xl mb-10 leading-snug italic">
-            &ldquo;I used to spend my evenings copy-pasting resumes. Now I open my dashboard to see interviews waiting. It feels like cheating. Had 3 offers on the table simultaneously.&rdquo;
-          </blockquote>
-          <div className="flex items-center gap-4">
-            <Image 
-              src="/images/user-icon.png" 
-              alt="Tom Wilson" 
-              width={48} 
-              height={48} 
-              className="rounded-full"
-              style={{ width: "48px", height: "auto" }}
-            />
-            <div className="text-left">
-              <div className="font-bold text-text-darkest">Tom Wilson</div>
-              <div className="text-sm text-text-secondary">Junior Developer</div>
+          <div className="max-w-4xl w-full bg-surface border border-border rounded-2xl p-10 shadow-sm flex flex-col items-center text-center">
+            <blockquote className="text-2xl md:text-3xl font-medium text-text-darkest mb-10 leading-snug italic">
+              &ldquo;I used to spend my evenings copy-pasting resumes. Now I open my dashboard to see interviews waiting. It feels like cheating. Had 3 offers on the table simultaneously.&rdquo;
+            </blockquote>
+            <div className="flex items-center gap-4">
+              <Image 
+                src="/images/user-icon.png" 
+                alt="Tom Wilson" 
+                width={48} 
+                height={48} 
+                className="rounded-full"
+                style={{ width: "48px", height: "auto" }}
+              />
+              <div className="text-left">
+                <div className="font-bold text-text-darkest">Tom Wilson</div>
+                <div className="text-sm text-text-secondary">Junior Developer</div>
+              </div>
             </div>
           </div>
         </section>
@@ -233,9 +211,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-12 border-t border-border-muted flex flex-col md:flex-row items-center justify-between gap-8">
         <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center">
-            <Image src="/logo.png" alt="JobFolio Logo" width={24} height={24} className="invert brightness-0" style={{ width: '22px', height: 'auto' }} />
-          </div>
+          <Image src="/logo.png" alt="JobFolio Logo" width={32} height={32} className="rounded-lg" />
           <span className="text-[19px] font-bold text-text-darkest leading-7">JobFolio</span>
         </Link>
         <div className="flex items-center gap-8">

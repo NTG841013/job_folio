@@ -19,7 +19,21 @@ export default async function proxy(request: NextRequest) {
   const { accessToken, error: refreshError } = await updateSession({
     baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL,
     anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY,
-    requestCookies: request.cookies as any,
+    requestCookies: {
+      get: (name: string) => {
+        const val = request.cookies.get(name);
+        if (val) return val;
+        if (name.includes("_")) return request.cookies.get(name.replace(/_/g, "-"));
+        if (name.includes("-")) return request.cookies.get(name.replace(/-/g, "_"));
+        return val;
+      },
+      set: (name: string, value: string, options: any) => {
+        response.cookies.set(name, value, options);
+      },
+      delete: (name: string) => {
+        response.cookies.delete(name);
+      },
+    } as any,
     responseCookies: response.cookies as any,
   });
 
@@ -27,14 +41,8 @@ export default async function proxy(request: NextRequest) {
     console.warn(`[Proxy] Session update error:`, refreshError.message);
   }
 
-  // Force clean up of hyphenated cookies if underscore versions exist
-  if (request.cookies.has('insforge_access_token') && request.cookies.has('insforge-access-token')) {
-    response.cookies.delete('insforge-access-token');
-    response.cookies.delete('insforge-refresh-token');
-  }
-
   // Use the request cookies and the current access token for the server client
-  const insforge = await createInsforgeServer(request.cookies as any, accessToken || undefined);
+  const insforge = await createInsforgeServer(request.cookies as any, accessToken || undefined); // eslint-disable-line @typescript-eslint/no-explicit-any
   
   const {
     data: { user },

@@ -22,15 +22,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const insforge = await createInsforgeServer(cookieStore as any);
+  const insforge = await createInsforgeServer(cookieStore as any); // eslint-disable-line @typescript-eslint/no-explicit-any
   const { data: { user } } = await insforge.auth.getCurrentUser();
-  const accessToken = cookieStore.get("insforge_access_token")?.value ?? null;
+  const accessToken = cookieStore.get("insforge-access-token")?.value ?? cookieStore.get("insforge_access_token")?.value ?? null;
+  const refreshToken = cookieStore.get("insforge-refresh-token")?.value ?? cookieStore.get("insforge_refresh_token")?.value ?? null;
 
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-text-primary">
         <PostHogProvider>
-          <AuthInitializer user={user} accessToken={accessToken}>
+          <AuthInitializer user={user} accessToken={accessToken} refreshToken={refreshToken}>
             {children}
           </AuthInitializer>
         </PostHogProvider>

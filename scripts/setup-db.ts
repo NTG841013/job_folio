@@ -37,6 +37,7 @@ CREATE TABLE public.profiles (
   portfolio_url TEXT,
   work_authorization TEXT,
   resume_pdf_url TEXT,
+  generated_resume_pdf_url TEXT,
   is_complete BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -51,6 +52,7 @@ CREATE TABLE public.agent_runs (
   status TEXT DEFAULT 'running',
   job_title_searched TEXT,
   location_searched TEXT,
+  country_searched TEXT,
   jobs_found INTEGER DEFAULT 0,
   started_at TIMESTAMPTZ DEFAULT now(),
   completed_at TIMESTAMPTZ
