@@ -100,7 +100,7 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-6">
               <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
                 <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Find jobs that actually fit</h3>
-                <p className="text-text-secondary">Search by title and location or paste a job link. Get matched roles you can quickly scan.</p>
+                <p className="text-text-secondary">Search by title and location in over 10 jurisdictions. Get matched roles you can quickly scan.</p>
               </div>
               <div className="p-6 bg-surface border border-border rounded-xl shadow-sm hover:border-accent transition-all cursor-default group">
                 <h3 className="text-lg font-bold text-text-darkest mb-2 group-hover:text-accent transition-colors">Know the Company Before You Apply</h3>
@@ -162,7 +162,7 @@ export default function Home() {
           <span className="text-xs font-bold text-accent uppercase tracking-widest mb-6">Success Stories</span>
           <div className="max-w-4xl w-full bg-surface border border-border rounded-2xl p-10 shadow-sm flex flex-col items-center text-center">
             <blockquote className="text-2xl md:text-3xl font-medium text-text-darkest mb-10 leading-snug italic">
-              &ldquo;I used to spend my evenings copy-pasting resumes. Now I open my dashboard to see interviews waiting. It feels like cheating. Had 3 offers on the table simultaneously.&rdquo;
+              &ldquo;I used to spend my evenings copy-pasting resumes. Now I open Jobfolio to see which roles actually fit, so I dont waste time on those that dont. It feels like cheating. Had 3 offers on the table simultaneously.&rdquo;
             </blockquote>
             <div className="flex items-center gap-4">
               <Image 

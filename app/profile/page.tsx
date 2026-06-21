@@ -363,11 +363,37 @@ export default function ProfilePage() {
               <h3 className="text-base font-bold text-text-darkest mb-6">Account</h3>
               <div className="space-y-3">
                 <button 
-                  onClick={() => signOutAction()}
-                  className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-[#7C5CFC] hover:bg-[#7C5CFC]/90 text-white text-sm font-bold rounded-full transition-all shadow-sm active:scale-[0.98]"
+                  onClick={() => {
+                    startTransition(async () => {
+                      const result = await signOutAction();
+                      
+                      // Clear client-side SDK session too
+                      try {
+                        await insforge.auth.signOut();
+                      } catch (sdkError) {
+                        console.warn("[Profile] SDK signOut warning:", sdkError);
+                      }
+
+                      if (result.success) {
+                        if (typeof window !== 'undefined' && (window as any).posthog) {
+                          (window as any).posthog.reset();
+                        }
+                        setUser(null);
+                        window.location.href = "/";
+                      }
+                    });
+                  }}
+                  disabled={isPending}
+                  className={`w-full flex items-center justify-center gap-3 py-3 px-6 bg-[#7C5CFC] hover:bg-[#7C5CFC]/90 text-white text-sm font-bold rounded-full transition-all shadow-sm active:scale-[0.98] ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                  Sign Out
+                  {isPending ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  ) : (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                      Sign Out
+                    </>
+                  )}
                 </button>
               </div>
             </div>

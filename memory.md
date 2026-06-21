@@ -1,6 +1,6 @@
 # Memory — Phase 6: Tailoring & Application (Feature 18)
 
-Last updated: 2026-06-21 21:58
+Last updated: 2026-06-21 22:56
 
 ## What was built
 
@@ -16,6 +16,9 @@ Last updated: 2026-06-21 21:58
     - **In-place Editing**: Integrated `textarea` with database persistence and backup/restore safety.
     - **Action Bar**: Tailored background colors and `rounded-xl` buttons for Copy/Edit/Download.
   - **PDF Export (`CoverLetterPDF.tsx`)**: High-fidelity formal business letter template using `@react-pdf/renderer`.
+- **Auth Fix (Sign Out)**:
+  - Implemented robust sign-out flow combining server-side cookie clearing (`signOutAction`) with client-side SDK session termination and `window.location.href` hard redirect to `/`.
+  - Integrated `useTransition` for loading states and PostHog reset on logout in both `Navbar.tsx` and `ProfilePage.tsx`.
 - **UI & Layout Refinements**:
   - **Job Details Page**: Restacked action buttons (stacked vertically), increased bottom padding (`pb-56`), and refined sticky footer gradient.
   - **Data Resilience**: Fixed layout overflow in info cards (Salary, Location, etc.) using `min-w-0` and tooltips.
@@ -30,6 +33,7 @@ Last updated: 2026-06-21 21:58
 
 ## Problems solved
 
+- **Ghost Auth State**: Resolved issue where frontend didn't update to signed-out state by forcing a full application reset and clearing both server/client sessions.
 - **Placeholder Pollution**: Implemented `cleanLetterContent` (regex-based) to strip AI-generated headers/dates that conflicted with our UI-provided professional template.
 - **Card Layout Breaks**: Resolved issues where long salary estimates or locations would break the flex-box layout on Job Details cards.
 - **Z-Index & Scrolling**: Fixed content being hidden behind the sticky footer by significantly increasing page bottom padding.
@@ -37,6 +41,7 @@ Last updated: 2026-06-21 21:58
 ## Current state
 
 - **Feature 18 is 100% complete and verified** (Generation -> Edit -> Copy -> PDF).
+- **Auth Flow is robust**: Sign-out is fixed and synchronizes server/client state.
 - **Dashboard & Analytics** are stable and verified with real data.
 - Project is build-stable, lint-clean, and strictly follows the Design System.
 

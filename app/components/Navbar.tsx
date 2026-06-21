@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { insforge } from '@/lib/insforge-client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Briefcase, User, LogOut } from 'lucide-react';
 import { signOutAction } from '@/app/auth/actions';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
+  const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     let mounted = true;
@@ -35,6 +37,39 @@ export default function Navbar() {
       mounted = false; 
     };
   }, []);
+
+  const handleSignOut = () => {
+    startTransition(async () => {
+      try {
+        const result = await signOutAction();
+        
+        // Clear client-side SDK session too
+        try {
+          await insforge.auth.signOut();
+        } catch (sdkError) {
+          console.warn("[Navbar] SDK signOut warning:", sdkError);
+        }
+
+        if (result.success) {
+          // Clear PostHog identity if possible
+          if (typeof window !== 'undefined' && (window as any).posthog) {
+            (window as any).posthog.reset();
+          }
+          
+          // Clear local state immediately
+          setUser(null);
+          
+          // Force a full page reload to the homepage to clear all client-side state
+          // and ensure the server-side auth check runs fresh.
+          window.location.href = "/";
+        } else {
+          console.error("[Navbar] Sign out failed:", result.error);
+        }
+      } catch (e) {
+        console.error("[Navbar] Sign out exception:", e);
+      }
+    });
+  };
 
   const isActive = (path: string) => pathname === path;
 
@@ -93,11 +128,12 @@ export default function Navbar() {
                 {user.email?.[0].toUpperCase() || 'U'}
               </Link>
               <button 
-                onClick={() => signOutAction()}
-                className="flex items-center gap-2 text-sm font-medium text-text-dark hover:text-error transition-colors cursor-pointer"
+                onClick={handleSignOut}
+                disabled={isPending}
+                className={`flex items-center gap-2 text-sm font-medium text-text-dark hover:text-error transition-colors cursor-pointer ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
               >
                 <LogOut size={18} />
-                <span className="hidden sm:inline">Sign out</span>
+                <span className="hidden sm:inline">{isPending ? 'Signing out...' : 'Sign out'}</span>
               </button>
             </div>
           )}

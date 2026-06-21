@@ -79,6 +79,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - [x] 30 Fix: SDK Type Compliance & Build Stability ✓ (Resolved TypeScript build error "getAll does not exist in type Pick<CookieStore, 'get'>" by aligning `lib/insforge-server.ts` and `proxy.ts` with actual SDK interfaces; updated `architecture.md` and `library-docs.md` to correct stale API patterns; verified stability with successful production build)
 - [x] 31 Multi-Currency Salary Support ✓ (Implemented `formatSalary` utility with currency mapping and USD conversion for all 16 supported countries; updated Adzuna agent to use local currency symbols and provide approximate USD equivalents in the "Salary Est." field, resolving "N/A" and hardcoded "$" issues)
 - [x] 32 AI-Powered Salary Estimation & Retroactive Fix ✓ (Created `salary-estimator` agent using GPT-4o to provide realistic salary ranges when Adzuna data is missing; retroactively updated all "N/A" salary records in the database using a service-level script; integrated estimation fallback into the main discovery pipeline)
+- [x] 33 Fix: Robust Sign Out & UI Refresh ✓ (Resolved issue where frontend didn't update to signed-out state by implementing a combined server/client sign-out flow with hard redirect; ensured PostHog reset and local state clearing across Navbar and Profile pages)
 
 ### Phase 6 — Tailoring & Application
 
