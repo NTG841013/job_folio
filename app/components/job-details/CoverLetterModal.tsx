@@ -39,7 +39,18 @@ export const CoverLetterModal = ({
   userProfile 
 }: CoverLetterModalProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [content, setContent] = useState(existingContent || '');
+  const [content, setContent] = useState(() => {
+    if (!existingContent) return '';
+    const currentDateStr = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    return existingContent
+      .replace(/\[Date\]/gi, currentDateStr)
+      .replace(/\[Candidate Name\]/gi, userProfile.full_name)
+      .replace(/\[Company Name\]/gi, company);
+  });
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [logs, setLogs] = useState<{ message: string; level: string; created_at: string }[]>([]);
   const [copied, setCopied] = useState(false);
@@ -109,7 +120,9 @@ export const CoverLetterModal = ({
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(content);
+    const currentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const header = `${userProfile.full_name}\n${userProfile.email}${userProfile.phone ? `\n${userProfile.phone}` : ''}${userProfile.location ? `\n${userProfile.location}` : ''}\n\n${currentDateStr}\n\n`;
+    navigator.clipboard.writeText(header + content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -144,7 +157,20 @@ export const CoverLetterModal = ({
           
           {content ? (
             <div className="space-y-4">
-              <div className="bg-surface-tertiary/50 border border-border rounded-2xl p-6 font-serif text-sm text-text-slate leading-relaxed whitespace-pre-wrap min-h-[400px]">
+              <div className="bg-surface-tertiary/50 border border-border rounded-2xl p-8 font-serif text-sm text-text-slate leading-relaxed whitespace-pre-wrap min-h-[500px] shadow-inner">
+                {/* Visual Header for the letter in the modal */}
+                <div className="mb-8 border-b border-border-muted pb-6 not-italic font-sans">
+                  <h1 className="text-xl font-bold text-accent mb-1">{userProfile.full_name}</h1>
+                  <div className="text-xs text-text-muted flex flex-wrap gap-x-4 gap-y-1">
+                    <span>{userProfile.email}</span>
+                    {userProfile.phone && <span>{userProfile.phone}</span>}
+                    {userProfile.location && <span>{userProfile.location}</span>}
+                  </div>
+                  <div className="mt-4 text-sm font-medium text-text-primary">
+                    {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </div>
+                </div>
+
                 {content}
               </div>
               <div className="flex items-center gap-3">
