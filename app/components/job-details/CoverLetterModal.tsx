@@ -8,10 +8,48 @@ import {
   Download, 
   X,
   Sparkles,
-  Info
+  Info,
+  Edit3,
+  Save
 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { CoverLetterPDF } from './CoverLetterPDF';
+
+// Helper to remove common header elements if they exist in the content
+const cleanLetterContent = (text: string, fullName: string, company: string) => {
+  if (!text) return '';
+  
+  const cleaned = text;
+  const lowerFullName = fullName.toLowerCase();
+  const dateRegex = /^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}$/i;
+  const dateWithLabelRegex = /^(Date|Today's Date|Current Date):\s+.*$/i;
+  
+  const lines = cleaned.split('\n');
+  const resultLines = [];
+  let foundStartOfContent = false;
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    const lowerLine = trimmedLine.toLowerCase();
+    
+    if (!foundStartOfContent) {
+      if (trimmedLine === '' || 
+          lowerLine === lowerFullName ||
+          (lowerLine.includes(lowerFullName) && (lowerLine.includes("name:") || lowerLine.includes("candidate:"))) ||
+          lowerLine.includes("[candidate name]") ||
+          lowerLine.includes("[today's date]") ||
+          lowerLine.includes("[date]") ||
+          dateRegex.test(trimmedLine) ||
+          dateWithLabelRegex.test(trimmedLine)) {
+        continue;
+      }
+      foundStartOfContent = true;
+    }
+    resultLines.push(line);
+  }
+  
+  return resultLines.join('\n').trim().replace(/\[Company Name\]/gi, company);
+};
 
 interface CoverLetterModalProps {
   isOpen: boolean;
@@ -39,18 +77,12 @@ export const CoverLetterModal = ({
   userProfile 
 }: CoverLetterModalProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [content, setContent] = useState(() => {
-    if (!existingContent) return '';
-    const currentDateStr = new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    return existingContent
-      .replace(/\[Date\]/gi, currentDateStr)
-      .replace(/\[Candidate Name\]/gi, userProfile.full_name)
-      .replace(/\[Company Name\]/gi, company);
-  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [backupContent, setBackupContent] = useState('');
+  const [content, setContent] = useState(() => 
+    cleanLetterContent(existingContent || '', userProfile.full_name, company)
+  );
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [logs, setLogs] = useState<{ message: string; level: string; created_at: string }[]>([]);
   const [copied, setCopied] = useState(false);
@@ -106,7 +138,7 @@ export const CoverLetterModal = ({
       const result = await response.json();
 
       if (result.success) {
-        setContent(result.data.coverLetter);
+        setContent(cleanLetterContent(result.data.coverLetter, userProfile.full_name, company));
         setActiveRunId(result.data.runId);
       } else {
         console.error('Generation failed:', result.error);
@@ -116,6 +148,24 @@ export const CoverLetterModal = ({
       console.error('Generation error:', error);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      const { error } = await insforge.database
+        .from('jobs')
+        .update({ cover_letter: content })
+        .eq('id', jobId);
+
+      if (error) throw error;
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Save error:', error);
+      alert('Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -157,7 +207,7 @@ export const CoverLetterModal = ({
           
           {content ? (
             <div className="space-y-4">
-              <div className="bg-surface-tertiary/50 border border-border rounded-2xl p-8 font-serif text-sm text-text-slate leading-relaxed whitespace-pre-wrap min-h-[500px] shadow-inner">
+              <div className={`bg-surface-tertiary/50 border border-border rounded-2xl p-8 font-serif text-sm text-text-slate leading-relaxed min-h-[500px] shadow-inner transition-all ${isEditing ? 'ring-2 ring-accent/20 border-accent/30' : ''}`}>
                 {/* Visual Header for the letter in the modal */}
                 <div className="mb-8 border-b border-border-muted pb-6 not-italic font-sans">
                   <h1 className="text-xl font-bold text-accent mb-1">{userProfile.full_name}</h1>
@@ -171,40 +221,86 @@ export const CoverLetterModal = ({
                   </div>
                 </div>
 
-                {content}
+                {isEditing ? (
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="w-full bg-transparent border-none focus:ring-0 p-0 font-serif text-sm text-text-slate leading-relaxed min-h-[400px] resize-none outline-none"
+                    autoFocus
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap">
+                    {content}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-3">
-                <button 
-                  onClick={handleCopy}
-                  className="flex-1 btn-secondary py-2.5 flex items-center justify-center gap-2"
-                >
-                  {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copied' : 'Copy Text'}
-                </button>
-                
-                <PDFDownloadLink 
-                  document={
-                    <CoverLetterPDF 
-                      data={{
-                        full_name: userProfile.full_name,
-                        email: userProfile.email,
-                        phone: userProfile.phone,
-                        location: userProfile.location,
-                        content: content,
-                        date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                      }} 
-                    />
-                  } 
-                  fileName={`Cover_Letter_${company.replace(/\s+/g, '_')}.pdf`}
-                  className="flex-1 btn-primary py-2.5 flex items-center justify-center gap-2"
-                >
-                  {({ loading }) => (
-                    <>
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                      Download PDF
-                    </>
-                  )}
-                </PDFDownloadLink>
+                {isEditing ? (
+                  <>
+                    <button 
+                      onClick={() => {
+                        setContent(backupContent);
+                        setIsEditing(false);
+                      }}
+                      className="flex-1 bg-surface-tertiary text-text-secondary border border-border py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-border-light transition-all active:scale-[0.98]"
+                      disabled={isSaving}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleSave}
+                      className="flex-[2] btn-primary py-2.5 rounded-xl flex items-center justify-center gap-2"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      Save Changes
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => {
+                        setBackupContent(content);
+                        setIsEditing(true);
+                      }}
+                      className="flex-1 bg-info-lightest text-info-foreground border border-info-light py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-info-light transition-all active:scale-[0.98]"
+                    >
+                      <Edit3 className="w-4 h-4 text-info-foreground" />
+                      Edit
+                    </button>
+                    <button 
+                      onClick={handleCopy}
+                      className="flex-1 bg-accent-muted text-accent border border-accent-light py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-accent-light transition-all active:scale-[0.98]"
+                    >
+                      {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4 text-accent" />}
+                      {copied ? 'Copied' : 'Copy'}
+                    </button>
+                    
+                    <PDFDownloadLink 
+                      document={
+                        <CoverLetterPDF 
+                          data={{
+                            full_name: userProfile.full_name,
+                            email: userProfile.email,
+                            phone: userProfile.phone,
+                            location: userProfile.location,
+                            content: content,
+                            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                          }} 
+                        />
+                      } 
+                      fileName={`Cover_Letter_${company.replace(/\s+/g, '_')}.pdf`}
+                      className="flex-[1.5] btn-primary py-2.5 rounded-xl flex items-center justify-center gap-2"
+                    >
+                      {({ loading }) => (
+                        <>
+                          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                          PDF
+                        </>
+                      )}
+                    </PDFDownloadLink>
+                  </>
+                )}
               </div>
             </div>
           ) : isGenerating ? (
@@ -268,7 +364,7 @@ export const CoverLetterModal = ({
 
               <button 
                 onClick={handleGenerate}
-                className="btn-primary w-full py-3 flex items-center justify-center gap-2"
+                className="btn-primary w-full py-3 rounded-xl flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
                 Generate Tailored Letter

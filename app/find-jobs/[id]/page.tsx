@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, use, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/app/components/Navbar';
 import CompanyResearchDossier from '@/app/components/CompanyResearchDossier';
@@ -39,7 +38,7 @@ interface Job {
   source_url: string;
   external_apply_url: string;
   found_at: string;
-  company_research: any;
+  company_research: unknown;
   cover_letter?: string;
 }
 
@@ -53,7 +52,6 @@ interface Profile {
 
 export default function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const router = useRouter();
   const [job, setJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isResearching, setIsResearching] = useState(false);
@@ -202,7 +200,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <main className="min-h-screen bg-background pb-32">
+    <main className="min-h-screen bg-background pb-56">
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-6 pt-8 space-y-6">
@@ -248,8 +246,8 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
             <div className="w-10 h-10 rounded-lg bg-success-lightest flex items-center justify-center">
               <DollarSign className="w-5 h-5 text-success" />
             </div>
-            <div>
-              <p className="text-sm font-bold text-text-primary truncate">{job.salary || '—'}</p>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-text-primary truncate" title={job.salary || '—'}>{job.salary || '—'}</p>
               <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Salary Est.</p>
             </div>
           </div>
@@ -268,8 +266,8 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
             <div className="w-10 h-10 rounded-lg bg-accent-light flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-accent" />
             </div>
-            <div>
-              <p className="text-sm font-bold text-text-primary truncate">{job.job_type || '—'}</p>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-text-primary truncate" title={job.job_type || '—'}>{job.job_type || '—'}</p>
               <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Job Type</p>
             </div>
           </div>
@@ -278,8 +276,8 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
             <div className="w-10 h-10 rounded-lg bg-surface-tertiary flex items-center justify-center">
               <Clock className="w-5 h-5 text-text-muted" />
             </div>
-            <div>
-              <p className="text-sm font-bold text-text-primary truncate">{getTimeAgo(job.found_at)}</p>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-text-primary truncate" title={getTimeAgo(job.found_at)}>{getTimeAgo(job.found_at)}</p>
               <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Date Found</p>
             </div>
           </div>
@@ -464,11 +462,11 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Sticky Bottom Apply Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/80 to-transparent">
-        <div className="max-w-4xl mx-auto flex gap-4">
+      <div className="fixed bottom-0 left-0 right-0 px-6 pb-8 pt-12 bg-gradient-to-t from-background via-background/90 to-transparent z-40">
+        <div className="max-w-4xl mx-auto flex flex-col gap-4">
           <button 
             onClick={() => setIsCoverLetterModalOpen(true)}
-            className="flex-1 btn-secondary py-4 text-base shadow-xl flex items-center justify-center gap-2 group"
+            className="w-full btn-secondary py-4 text-base font-bold shadow-xl flex items-center justify-center gap-2 rounded-2xl group"
           >
             <Sparkles className="w-5 h-5 text-accent group-hover:scale-110 transition-transform" />
             {job.cover_letter ? 'View Cover Letter' : 'Generate Cover Letter'}
@@ -477,7 +475,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
             href={job.external_apply_url || job.source_url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex-[2] btn-primary py-4 text-base shadow-xl flex items-center justify-center gap-2"
+            className="w-full btn-primary py-4 text-base font-bold shadow-xl flex items-center justify-center gap-2 rounded-2xl"
           >
             Apply Now at {job.company}
           </a>

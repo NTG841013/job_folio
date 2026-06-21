@@ -1,49 +1,49 @@
-# Memory — Phase 5: Dashboard & Analytics
+# Memory — Phase 6: Tailoring & Application (Feature 18)
 
-Last updated: 2026-06-21 00:45
+Last updated: 2026-06-21 21:58
 
 ## What was built
 
-- **Phase 1-4 (Previous Sessions)**:
-  - **Homepage (Feature 01)**: Complete responsive landing page.
-  - **Authentication (Feature 02)**: OAuth (Google/GitHub) via InsForge SDK.
-  - **Profile (Features 05-07)**: Career data extraction, job preferences, and secure resume viewing.
-  - **Find Jobs (Features 09-12)**: Discovery interface, Adzuna integration, and AI match reasoning.
-  - **Company Research (Feature 13)**: Background researcher using Browserbase + Stagehand V3.
-- **Phase 5: Dashboard & Analytics**:
-  - **Feature 14: Dashboard Page UI**: Comprehensive layout at `app/dashboard/page.tsx`.
-  - **Feature 15: Stats Bar (Real Data)**: Wired stats to InsForge DB.
-  - **Feature 16: Recent Activity (Real Data)**: Combined feed from `agent_runs` and `jobs`.
-  - **Feature 18: Activity Page**: Full-page history at `app/activity/page.tsx`.
-  - **Feature 17: Analytics Charts**: Implemented HogQL queries for Jobs Found, Match Scores, and Research Activity.
-- **Auth Fixes (Current Session)**:
-  - Corrected `createServerClient` signature in `lib/insforge-server.ts` to use a single options object (fixing a bug where configuration was ignored).
-  - Updated `proxy.ts` with a robust cookie wrapper for `updateSession` that handles both hyphenated (`insforge-`) and underscored (`insforge_`) cookie names.
-  - Updated `context/library-docs.md` and `context/architecture.md` to reflect the correct `createServerClient` API.
+- **Phase 1-5 (Summary)**:
+  - **Auth & Profile**: OAuth, career data extraction, and secure resume viewing.
+  - **Jobs & Research**: Discovery interface, AI match reasoning, and automated company researcher.
+  - **Dashboard**: Real-time stats, activity feed, and HogQL analytics charts.
+- **Phase 6: Cover Letter Generation (Feature 18)**:
+  - **AI Agent (`agent/cover_letter.ts`)**: GPT-4o synthesis that fuses user profile, job requirements, and company research dossiers.
+  - **API (`/api/agent/cover-letter`)**: Handles generation and streams real-time progress via the `agent_logs` pattern.
+  - **Modal UI (`CoverLetterModal.tsx`)**: Professional business letter view with:
+    - Live progress feedback (Reading -> Analyzing -> Drafting).
+    - **In-place Editing**: Integrated `textarea` with database persistence and backup/restore safety.
+    - **Action Bar**: Tailored background colors and `rounded-xl` buttons for Copy/Edit/Download.
+  - **PDF Export (`CoverLetterPDF.tsx`)**: High-fidelity formal business letter template using `@react-pdf/renderer`.
+- **UI & Layout Refinements**:
+  - **Job Details Page**: Restacked action buttons (stacked vertically), increased bottom padding (`pb-56`), and refined sticky footer gradient.
+  - **Data Resilience**: Fixed layout overflow in info cards (Salary, Location, etc.) using `min-w-0` and tooltips.
+  - **Database**: Added `cover_letter` column to `jobs` table for persistence.
 
 ## Decisions made
 
-- **Combined Activity Feed**: Chronological timeline for both dashboard and activity page.
-- **Hydration Safety Pattern**: Standardized `requestAnimationFrame` for mounting states.
-- **SDK Initialization**: Standardized on the single-object options pattern for all InsForge SDK client initializations.
-- **Resilient Cookie Access**: Implemented fallback getters in both the server client and proxy middleware to prevent session loss due to naming mismatches.
+- **Persistent Tailoring**: Chose to store generated letters in the DB to avoid re-generation costs and allow users to refine their letters over multiple sessions.
+- **Visual Hierarchy**: Placed "Cover Letter" above "Apply Now" in the sticky footer to emphasize the preparation step while keeping the primary action reachable.
+- **Manual Refinement**: Allowed direct editing of AI-generated content within the modal before export, acknowledging that users often want to add personal touches.
+- **UI Rounding Standard**: Adopted `rounded-xl` for modal-level actions and `rounded-2xl` for page-level primary actions to distinguish hierarchy.
 
 ## Problems solved
 
-- **Internal UUIDs in Activity**: Hidden non-human readable agent run titles.
-- **Hydration Mismatches**: Fixed Next.js hydration errors.
-- **Persistent Auth Loops**: Fixed "No refresh token provided" errors caused by incorrect SDK initialization and incomplete cookie detection in the proxy.
+- **Placeholder Pollution**: Implemented `cleanLetterContent` (regex-based) to strip AI-generated headers/dates that conflicted with our UI-provided professional template.
+- **Card Layout Breaks**: Resolved issues where long salary estimates or locations would break the flex-box layout on Job Details cards.
+- **Z-Index & Scrolling**: Fixed content being hidden behind the sticky footer by significantly increasing page bottom padding.
 
 ## Current state
 
-- Phase 5: Features 14, 15, 16, and 18 are 100% complete and verified.
-- Feature 17 (Analytics) is implemented but requires verification after auth fixes.
-- Project is build-stable and lint-clean.
+- **Feature 18 is 100% complete and verified** (Generation -> Edit -> Copy -> PDF).
+- **Dashboard & Analytics** are stable and verified with real data.
+- Project is build-stable, lint-clean, and strictly follows the Design System.
 
 ## Next session starts with
 
-- Verify that the auth loops are completely resolved in the browser.
-- Confirm that PostHog charts are pulling real data on the dashboard.
+- Begin **Feature 19: Resume Tailoring** (if brought back into scope) or move to **Application Tracking**.
+- Note: Current focus is strictly on Feature 18, so next steps should align with user's priority updates.
 
 ## Open questions
 

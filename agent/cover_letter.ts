@@ -62,7 +62,38 @@ Write the cover letter now.`;
     const content = response.choices[0].message.content;
     if (!content) throw new Error('Empty response from OpenAI');
 
-    return content.trim();
+    // Cleanup: remove common header elements if the AI included them despite instructions
+    const cleaned = content.trim();
+    const fullName = profile.full_name.toLowerCase();
+    const lines = cleaned.split('\n');
+    const resultLines = [];
+    let foundStartOfContent = false;
+    
+    const dateRegex = /^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}$/i;
+    const dateWithLabelRegex = /^(Date|Today's Date|Current Date):\s+.*$/i;
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      const lowerLine = trimmedLine.toLowerCase();
+      
+      if (!foundStartOfContent) {
+        if (trimmedLine === '' || 
+            lowerLine === fullName ||
+            (lowerLine.includes(fullName) && (lowerLine.includes("name:") || lowerLine.includes("candidate:"))) ||
+            lowerLine.includes("[candidate name]") ||
+            lowerLine.includes("[today's date]") ||
+            lowerLine.includes("[date]") ||
+            dateRegex.test(trimmedLine) ||
+            dateWithLabelRegex.test(trimmedLine)
+        ) {
+          continue;
+        }
+        foundStartOfContent = true;
+      }
+      resultLines.push(line);
+    }
+
+    return resultLines.join('\n').trim();
   } catch (error) {
     console.error('Error generating cover letter:', error);
     throw new Error('Failed to generate cover letter. Please try again later.');

@@ -96,9 +96,10 @@ After building any component — update this file with the component name, file 
 - **Path**: `app/find-jobs/[id]/page.tsx`
 - **Classes**:
   - **Job Details Page**
-  - **Layout**: `max-w-4xl mx-auto px-6 pt-8 space-y-6 pb-32`
+  - **Layout**: `max-w-4xl mx-auto px-6 pt-8 space-y-6 pb-56`
   - **Section Cards**: `bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4`
   - **Info Cards (Grid)**: `bg-surface border border-border rounded-xl p-4 flex items-center gap-3 shadow-sm`
+  - **Info Card Content**: `min-w-0` (container), `truncate` (text), `title` (hover tooltip for full content)
   - **Icon Containers**: `w-8 h-8 rounded-lg flex items-center justify-center` (used in section headers), `w-10 h-10 rounded-lg flex items-center justify-center` (used in info cards)
   - **Section Headings**: `text-[10px] font-bold text-text-muted uppercase tracking-wider`
   - **Match Badges**: `bg-success-lightest text-success border-success-light/30` (You have), `bg-accent-muted text-accent border-accent-light/30` (Gap skills)
@@ -108,7 +109,7 @@ After building any component — update this file with the component name, file 
     - **Footer Info**: `pt-4 border-t border-border-light flex justify-between items-center`
     - **Full Posting Link**: `inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-tertiary hover:bg-border rounded-lg text-xs font-bold transition-colors border border-border`
   - **Company Research Card**: `bg-surface border border-border rounded-2xl overflow-hidden shadow-sm`
-  - **Apply Button (Sticky)**: `fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/80 to-transparent`
+  - **Apply Button (Sticky)**: `fixed bottom-0 left-0 right-0 px-6 pb-8 pt-12 bg-gradient-to-t from-background via-background/90 to-transparent`
 - **Tokens**: `--color-success-lightest`, `--color-accent-muted`, `--color-accent`, `--color-text-muted`, `--color-surface-tertiary`, `--color-info-lightest`, `--color-warning-lightest`, `--color-error-lightest`
 
 ### Company Research Dossier
@@ -137,8 +138,14 @@ After building any component — update this file with the component name, file 
   - **Modal Container**: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay/60 backdrop-blur-sm`
   - **Modal Surface**: `bg-surface border border-border rounded-3xl w-full max-w-2xl max-h-[90vh] shadow-2xl overflow-hidden`
   - **Header**: `p-6 border-b border-border bg-surface-secondary/50`
-  - **Letter Body**: `bg-surface-tertiary/50 border border-border rounded-2xl p-6 font-serif text-sm text-text-slate leading-relaxed whitespace-pre-wrap min-h-[400px]`
-  - **Action Buttons**: `.btn-primary`, `.btn-secondary`
+  - **Letter Body**: `bg-surface-tertiary/50 border border-border rounded-2xl p-8 font-serif text-sm text-text-slate leading-relaxed shadow-inner transition-all`
+  - **Edit Mode**: `ring-2 ring-accent/20 border-accent/30`
+  - **Textarea**: `w-full bg-transparent border-none focus:ring-0 p-0 font-serif text-sm text-text-slate leading-relaxed min-h-[400px] resize-none outline-none`
+  - **Action Buttons**:
+    - **Edit**: `bg-info-lightest text-info-foreground border-info-light rounded-xl`
+    - **Copy**: `bg-accent-muted text-accent border-accent-light rounded-xl`
+    - **Primary (Save/PDF)**: `.btn-primary rounded-xl`
+    - **Neutral (Cancel)**: `bg-surface-tertiary text-text-secondary rounded-xl`
 - **Tokens**: `--color-accent-muted`, `--color-surface-tertiary`, `--color-text-slate`, `--color-overlay`
 
 ### Cover Letter PDF
